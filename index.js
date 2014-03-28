@@ -15,8 +15,7 @@ module.exports = function (options, callback) {
             if (error) {
                 if (error.code == 'ECONNRESET') {
                     logger.info("Connection reset on ", url, " trying again");
-                    maxRetry--;
-                    requestFunction(options, callback);
+                    retry();
                 } else {
                     callback(requestError(error));
                 }
@@ -24,13 +23,20 @@ module.exports = function (options, callback) {
                 callback(null, body);
             } else if (response.statusCode == 500 && _.str.contains(body, "Timeout")) {
                 logger.info({message: "Timeout, trying again", url: url, options: options, body: body});
-                maxRetry--;
-                requestFunction(options, callback);
+                retry();
+            } else if (response.statusCode == 503) {
+                logger.info({message: "503, trying again", url: url, options: options, body: body});
+                retry();
             } else {
                 callback(requestError(response.statusCode + " : " + body));
             }
         });
     };
+
+    function retry() {
+        maxRetry--;
+        requestFunction(options, callback);
+    }
 
     function requestError(error, message) {
         if (error instanceof Error) {
