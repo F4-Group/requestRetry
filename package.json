@@ -5,6 +5,7 @@
     "main": "index.js",
     "dependencies": {
         "request": "2.12.x",
-        "underscore": "1.4.x"
+        "underscore.string": "~2.3.3",
+        "underscore": "1.6.x"
     }
 }

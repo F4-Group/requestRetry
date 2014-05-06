@@ -1,5 +1,6 @@
 var request = require('request');
 var _ = require('underscore');
+_.str = require('underscore.string');
 var MAX_RETRY = 3;
 
 module.exports = function (options, callback) {
