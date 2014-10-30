@@ -8,10 +8,13 @@ module.exports = function (options, callback) {
         options = {url: options};
     var url = options.url || options.uri;
     var logger = options.logger || console;
-    var maxRetry = options.maxRetry || MAX_RETRY;
+    var leftRetries = options.maxRetry || MAX_RETRY;
     var requestFunction = function (options, callback) {
-        if (!maxRetry)
+        if (leftRetries <= 0) {
             callback(requestError("maxRetry reached, give up"));
+            return;
+        }
+
         request(options, function (error, response, body) {
             if (error) {
                 if (error.code == 'ECONNRESET') {
@@ -35,7 +38,7 @@ module.exports = function (options, callback) {
     };
 
     function retry() {
-        maxRetry--;
+        leftRetries--;
         requestFunction(options, callback);
     }
 
